@@ -27,6 +27,7 @@ augroup end
 augroup DiagnosisSignRefresh
     autocmd!
     autocmd InsertLeave,CursorHold * lua require'sign'.updateSign()
+    autocmd InsertLeave * lua require'jumpLoc'.initLocation()
 augroup end
 
 hi DiagnosisError cterm=bold ctermfg=168 gui=bold guifg=#e06c75

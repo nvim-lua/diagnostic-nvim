@@ -37,6 +37,10 @@ end
 -- Update location and jump index upon changing location list
 function M.updateLocation()
   M.location = api.nvim_call_function('getloclist', {0})
+  if #M.location == 0 then
+    M.prevLocationIndex = -1
+    M.nextLocationIndex = -1
+  end
   M.currentLocationIndex = -1
 end
 
@@ -116,7 +120,6 @@ end
 -- Don't do anything if diagnostic_auto_popup_while_jump == 0
 -- NOTE need to delay a certain amount of time to show correctly
 function M.openLineDiagnostics()
-    -- lsp.util.show_line_diagnostics()
   if api.nvim_get_var('diagnostic_auto_popup_while_jump') == 1 then
     local timer = vim.loop.new_timer()
     timer:start(100, 0, vim.schedule_wrap(function()
