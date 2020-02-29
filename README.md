@@ -1,4 +1,4 @@
-# diagnosis-nvim
+# diagnostic-nvim
 
 Nvim built in language server is amazing, but the diagnosis setting that it shipped with default
 may not be as great as other LSP plugins. Fortunately, it's very customizable with changing
@@ -23,7 +23,7 @@ diagnosis setting up to make it a more user friendly without adding too much to 
 
 - Install with any plugin manager by using the path on GitHub.
 ```
-Plug 'haorenW1025/floatLf-nvim'
+Plug 'haorenW1025/diagnostic-nvim'
 ```
 
 ## Command

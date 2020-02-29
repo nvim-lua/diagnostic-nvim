@@ -42,14 +42,18 @@ function M.updateLocation()
     M.nextLocationIndex = -1
   end
   M.currentLocationIndex = -1
+  M.initLocation()
 end
 
 function M.updatePosition()
   if M.prevLocationIndex == -1 and M.nextLocationIndex == -1 then
     return
   end
-  -- if M.currentLocationIndex == -1 then
-  -- end
+  -- Solve some unknown issue
+  if M.prevLocationIndex > #M.location or M.nextLocationIndex > #M.location then
+    M.initLocation()
+    return
+  end
   local row = api.nvim_call_function('line', {"."})
   local col = api.nvim_call_function('col', {"."})
 
@@ -74,12 +78,12 @@ function M.updatePosition()
       end
     until M.checkPrevLocation(row, col)
     M.nextLocationIndex = M.prevLocationIndex + 1
-    print(M.prevLocationIndex, M.nextLocationIndex)
   end
 end
 
 function M.refreshBufEnter()
-  -- HACK
+  -- HACK location list will not refresh when BufEnter
+  -- Use :edit to force refresh buffer, not work if the buffer is modified
   if api.nvim_buf_get_name(0) ~= '' and #vim.inspect(vim.lsp.buf_get_clients()) ~= 0 then
     api.nvim_command("silent! exec 'edit'")
     M.init = false
@@ -88,9 +92,8 @@ end
 
 function M.jumpNextLocation()
   M.updatePosition()
-  if M.nextLocationIndex > #M.location then
+  if M.nextLocationIndex > #M.location or M.nextLocationIndex == -1 then
     print("no next diagnostic\n")
-    api.nvim_command("redraw")
   else
     api.nvim_command("ll"..M.nextLocationIndex)
     M.currentLocationIndex = M.nextLocationIndex
@@ -104,9 +107,8 @@ end
 -- Show text when no previous location is available
 function M.jumpPrevLocation()
   M.updatePosition()
-  if M.prevLocationIndex == 0 then
+  if M.prevLocationIndex == 0 or M.prevLocationIndex == -1 then
     print("no previous diagnostic\n")
-    api.nvim_command("redraw")
   else
     api.nvim_command("ll"..M.prevLocationIndex)
     M.currentLocationIndex = M.prevLocationIndex

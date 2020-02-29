@@ -1,11 +1,18 @@
 local vim = vim
 local M = {}
+local err, method, result, client_id
+
 
 function M.modifyCallback()
-  local method = 'textDocument/publishDiagnostics'
-  -- local default_callback = vim.lsp.callbacks[method]
-  vim.lsp.callbacks[method] = function(_, _, result, _)
-    if not result then return end
+  local callback = 'textDocument/publishDiagnostics'
+  vim.lsp.callbacks[callback] = function(...)
+    err, method, result, client_id = ...
+    if vim.api.nvim_get_mode()['mode'] == "i" or vim.api.nvim_get_mode()['mode'] == "ic" then
+      return
+    end
+    if not result then
+      return
+    end
     local uri = result.uri
     local bufnr = vim.uri_to_bufnr(uri)
     if not bufnr then
@@ -39,27 +46,33 @@ function M.modifyCallback()
   end
 end
 
+function M.publish_diagnostics()
+  local default_callback = vim.lsp.callbacks["textDocument/publishDiagnostics"]
+  default_callback(err, method, result, client_id)
+end
+
+M.on_attach = function(_, _)
+  -- Setup autocmd
+  vim.api.nvim_command [[augroup DiagnosticRefresh]]
+    vim.api.nvim_command [[autocmd!]]
+    vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'jumpLoc'.initLocation()]]
+    vim.api.nvim_command [[autocmd BufEnter <buffer> lua require'jumpLoc'.refreshBufEnter()]]
+  vim.api.nvim_command [[augroup end]]
+
+  if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
+    vim.api.nvim_command [[augroup DiagnosticSign]]
+      vim.api.nvim_command [[autocmd!]]
+      vim.api.nvim_command [[autocmd InsertLeave,CursorHold * lua require'sign'.updateSign()]]
+    vim.api.nvim_command [[augroup end]]
+  end
+
+  if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
+    vim.api.nvim_command [[augroup DiagnosticInsertDelay]]
+      vim.api.nvim_command [[autocmd!]]
+      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'modify'.publish_diagnostics()]]
+    vim.api.nvim_command [[augroup end]]
+  end
+end
+
 return M
-
--- do
-  -- local default_callback = vim.lsp.callbacks["textDocument/publishDiagnostics"]
-  -- local err, method, params, client_id
-
-  -- vim.lsp.callbacks["textDocument/publishDiagnostics"] = function(...)
-    -- err, method, params, client_id = ...
-    -- if vim.api.nvim_get_mode().mode ~= "i" then
-      -- publish_diagnostics()
-    -- end
-  -- end
-
-  -- function publish_diagnostics()
-    -- default_callback(err, method, params, client_id)
-  -- end
--- end
-
--- local on_attach = function(_, bufnr)
-  -- vim.api.nvim_command [[autocmd InsertLeave <buffer> lua publish_diagnostics()]]
--- end
-
--- nvim_lsp.gopls.setup({on_attach=on_attach})
 

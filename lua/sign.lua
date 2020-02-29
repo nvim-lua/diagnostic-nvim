@@ -15,13 +15,13 @@ function M.updateSign()
   -- TODO
   local bufName = api.nvim_buf_get_name(0)
   local opts = {buffer = bufName}
-  api.nvim_call_function('sign_unplace', {'DiagnosisSign', opts})
+  api.nvim_call_function('sign_unplace', {'DiagnosticSign', opts})
   M.initSign()
 end
 
 function M.placeSign(num, bufName)
   local opts = {lnum = num}
-  api.nvim_call_function("sign_place", {0, 'DiagnosisSign', 'DiagnosisErrorSign', bufName, opts})
+  api.nvim_call_function("sign_place", {0, 'DiagnosticSign', 'DiagnosticErrorSign', bufName, opts})
 end
 
 return M

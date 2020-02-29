@@ -1,4 +1,4 @@
-if exists('g:loaded_diagnosis') | finish | endif
+if exists('g:loaded_diagnostic') | finish | endif
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -15,27 +15,20 @@ if ! exists('g:diagnostic_show_sign')
     let g:diagnostic_show_sign = 1
 endif
 
+if ! exists('g:diagnostic_insert_delay')
+    let g:diagnostic_insert_delay = 1
+endif
+
 if ! exists('g:diagnostic_auto_popup_while_jump')
     let g:diagnostic_auto_popup_while_jump = 1
 endif
 
-augroup DiagnosisRefresh
-    autocmd!
-    autocmd BufEnter * lua require'jumpLoc'.refreshBufEnter()
-augroup end
 
-augroup DiagnosisSignRefresh
-    autocmd!
-    autocmd InsertLeave,CursorHold * lua require'sign'.updateSign()
-    autocmd InsertLeave * lua require'jumpLoc'.initLocation()
-augroup end
+hi DiagnosticError cterm=bold ctermfg=168 gui=bold guifg=#e06c75
+sign define DiagnosticErrorSign text=✗ texthl=DiagnosticError
 
-hi DiagnosisError cterm=bold ctermfg=168 gui=bold guifg=#e06c75
-sign define DiagnosisErrorSign text=✗ texthl=DiagnosisError
-
-lua require'modify'.modifyCallback()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-let g:loaded_diagnosis = 1
+let g:loaded_diagnostic = 1
