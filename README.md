@@ -15,6 +15,7 @@ diagnosis setting up to make it a more user friendly without adding too much to 
 - Delay diagnostic when you're in insert mode.
 
 ## Demo
+![Demo](https://user-images.githubusercontent.com/35623968/75627012-6824f380-5c07-11ea-8f25-59ce1751e902.gif)
 
 ## Prerequisite
 - Neovim nightly

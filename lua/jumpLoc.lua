@@ -51,14 +51,17 @@ function M.updatePosition()
     return
   end
   -- Solve some unknown issue
-  if M.prevLocationIndex > #M.location or M.nextLocationIndex > #M.location then
-    M.initLocation()
-    return
-  end
+  -- if M.prevLocationIndex > #M.location or M.nextLocationIndex > #M.location then
+    -- M.initLocation()
+    -- return
+  -- end
   local row = api.nvim_call_function('line', {"."})
   local col = api.nvim_call_function('col', {"."})
 
   if M.currentLocationIndex ~= -1 then
+    if row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
+      return
+    end
     M.checkCurrentLocation(row, col)
   end
   if not M.checkNextLocation(row, col) then
