@@ -7,6 +7,8 @@ command! PrevDiagnostic lua require'jumpLoc'.jumpPrevLocation()
 command! NextDiagnostic lua require'jumpLoc'.jumpNextLocation() 
 command! OpenDiagnostic lua require'jumpLoc'.openDiagnostics() 
 
+" lua require'diagnostic'.modifyCallback()
+
 if ! exists('g:diagnostic_enable_virtual_text')
     let g:diagnostic_enable_virtual_text = 0
 endif
@@ -24,10 +26,6 @@ if ! exists('g:diagnostic_auto_popup_while_jump')
 endif
 
 
-if g:diagnostic_show_sign == 1
-    hi DiagnosticError cterm=bold ctermfg=168 gui=bold guifg=#e06c75
-    sign define DiagnosticErrorSign text=✗ texthl=DiagnosticError
-endif
 
 
 let &cpo = s:save_cpo

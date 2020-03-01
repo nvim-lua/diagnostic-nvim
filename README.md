@@ -75,6 +75,7 @@ let g:diagnostic_insert_delay = 0
 ## Future Work
 
 - [ ] Option to change virtual text format.
+- [ ] Option to change sign text.
 - [ ] Support different signs for different diagnosis level.
 
 
