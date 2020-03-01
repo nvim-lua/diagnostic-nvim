@@ -7,7 +7,7 @@ function M.modifyCallback()
   local callback = 'textDocument/publishDiagnostics'
   vim.lsp.callbacks[callback] = function(...)
     err, method, result, client_id = ...
-    if vim.api.nvim_get_var('diagnostic_insert_delay') == 0 then
+    if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
       if vim.api.nvim_get_mode()['mode'] == "i" or vim.api.nvim_get_mode()['mode'] == "ic" then
         return
       end
