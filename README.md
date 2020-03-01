@@ -79,4 +79,5 @@ let g:diagnostic_insert_delay = 0
 - [ ] Option to change sign text.
 - [ ] Support different signs for different diagnosis level.
 
-
+## WARNING
+This plugin is in early stage, might have unexpected issues.
