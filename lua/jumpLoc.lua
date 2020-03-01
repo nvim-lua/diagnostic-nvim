@@ -45,6 +45,7 @@ function M.updateLocation()
   M.initLocation()
 end
 
+-- adjust location
 function M.updatePosition()
   if M.prevLocationIndex == -1 and M.nextLocationIndex == -1 then
     return
@@ -90,10 +91,12 @@ function M.refreshBufEnter()
   end
 end
 
+-- Jump to next location
+-- Show warning text when no next location is available
 function M.jumpNextLocation()
   M.updatePosition()
   if M.nextLocationIndex > #M.location or M.nextLocationIndex == -1 then
-    print("no next diagnostic\n")
+    api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
   else
     api.nvim_command("ll"..M.nextLocationIndex)
     M.currentLocationIndex = M.nextLocationIndex
@@ -104,11 +107,11 @@ function M.jumpNextLocation()
 end
 
 -- Jump to previous location
--- Show text when no previous location is available
+-- Show warning text when no previous location is available
 function M.jumpPrevLocation()
   M.updatePosition()
   if M.prevLocationIndex == 0 or M.prevLocationIndex == -1 then
-    print("no previous diagnostic\n")
+    api.nvim_command("echohl WarningMsg | echo 'no previous diagnostic' | echohl None")
   else
     api.nvim_command("ll"..M.prevLocationIndex)
     M.currentLocationIndex = M.prevLocationIndex

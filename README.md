@@ -26,6 +26,14 @@ diagnosis setting up to make it a more user friendly without adding too much to 
 Plug 'haorenW1025/diagnostic-nvim'
 ```
 
+## Setup
+- Diagnostic-nvim require several autocommand set up to work properly, you should
+  set it up using the `on_attach` function like this.
+  ```
+  lua require'nvim_lsp'.pyls.setup{on_attach=require'diagnostic'.on_attach}
+  ```
+- Change `pyls` to whatever language server you are using.
+
 ## Command
 
 ## Options

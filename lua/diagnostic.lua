@@ -69,7 +69,7 @@ M.on_attach = function(_, _)
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
     vim.api.nvim_command [[augroup DiagnosticInsertDelay]]
       vim.api.nvim_command [[autocmd!]]
-      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'modify'.publish_diagnostics()]]
+      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.publish_diagnostics()]]
     vim.api.nvim_command [[augroup end]]
   end
 end
