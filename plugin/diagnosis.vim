@@ -24,8 +24,10 @@ if ! exists('g:diagnostic_auto_popup_while_jump')
 endif
 
 
-hi DiagnosticError cterm=bold ctermfg=168 gui=bold guifg=#e06c75
-sign define DiagnosticErrorSign text=✗ texthl=DiagnosticError
+if g:diagnostic_show_sign == 1
+    hi DiagnosticError cterm=bold ctermfg=168 gui=bold guifg=#e06c75
+    sign define DiagnosticErrorSign text=✗ texthl=DiagnosticError
+endif
 
 
 let &cpo = s:save_cpo
