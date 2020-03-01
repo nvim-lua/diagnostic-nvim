@@ -48,6 +48,7 @@ end
 -- adjust location
 function M.updatePosition()
   if M.prevLocationIndex == -1 and M.nextLocationIndex == -1 then
+    M.initLocation()
     return
   end
   -- Solve some unknown issue

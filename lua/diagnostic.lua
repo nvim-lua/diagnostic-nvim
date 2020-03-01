@@ -7,8 +7,10 @@ function M.modifyCallback()
   local callback = 'textDocument/publishDiagnostics'
   vim.lsp.callbacks[callback] = function(...)
     err, method, result, client_id = ...
-    if vim.api.nvim_get_mode()['mode'] == "i" or vim.api.nvim_get_mode()['mode'] == "ic" then
-      return
+    if vim.api.nvim_get_var('diagnostic_insert_delay') == 0 then
+      if vim.api.nvim_get_mode()['mode'] == "i" or vim.api.nvim_get_mode()['mode'] == "ic" then
+        return
+      end
     end
     if not result then
       return
@@ -62,14 +64,14 @@ M.on_attach = function(_, _)
   if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
     vim.api.nvim_command [[augroup DiagnosticSign]]
       vim.api.nvim_command [[autocmd!]]
-      vim.api.nvim_command [[autocmd InsertLeave,CursorHold * lua require'sign'.updateSign()]]
+      vim.api.nvim_command [[autocmd InsertLeave,CursorHold <buffer> lua require'sign'.updateSign()]]
     vim.api.nvim_command [[augroup end]]
   end
 
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
     vim.api.nvim_command [[augroup DiagnosticInsertDelay]]
       vim.api.nvim_command [[autocmd!]]
-      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.publish_diagnostics()]]
+      vim.api.nvim_command [[autocmd InsertLeave, CursorHold <buffer> lua require'diagnostic'.publish_diagnostics()]]
     vim.api.nvim_command [[augroup end]]
   end
 end
