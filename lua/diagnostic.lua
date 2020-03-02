@@ -24,24 +24,24 @@ function M.modifyCallback()
     vim.lsp.util.buf_clear_diagnostics(bufnr)
     vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
     vim.lsp.util.buf_diagnostics_underline(bufnr, result.diagnostics)
+    if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
+      vim.lsp.util.buf_diagnostics_signs(bufnr, result.diagnostics)
+    end
     if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
       vim.lsp.util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
     end
+    vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
     -- util.set_loclist(result.diagnostics)
     if result and result.diagnostics then
       for _, v in ipairs(result.diagnostics) do
         v.uri = v.uri or result.uri
       end
     end
-    vim.lsp.util.set_loclist(result.diagnostics)
+    vim.lsp.util.set_loclist(vim.lsp.util.locations_to_items(result.diagnostics))
     local loc = require 'jumpLoc'
     -- loc.init will be set to false when BufEnter
     if loc.init == false then
       loc.initLocation()
-      if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
-        local sign = require 'sign'
-        sign.initSign()
-      end
     else
       loc.updateLocation()
     end
@@ -60,13 +60,6 @@ M.on_attach = function(_, _)
     vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'jumpLoc'.initLocation()]]
     vim.api.nvim_command [[autocmd BufEnter <buffer> lua require'jumpLoc'.refreshBufEnter()]]
   vim.api.nvim_command [[augroup end]]
-
-  if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
-    vim.api.nvim_command [[augroup DiagnosticSign]]
-      vim.api.nvim_command [[autocmd!]]
-      vim.api.nvim_command [[autocmd InsertLeave,CursorHold <buffer> lua require'sign'.updateSign()]]
-    vim.api.nvim_command [[augroup end]]
-  end
 
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
     vim.api.nvim_command [[augroup DiagnosticInsertDelay]]

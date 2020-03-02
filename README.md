@@ -49,6 +49,7 @@ is disable by default, you can open enable it by
 ```
 let g:diagnostic_enable_virtual_text = 1
 ```
+- Make sure to use the latest branch of neovim which have sign support.
 
 ### Enable/Disable Sign
 - By default, diagnostic-nvim will show sign on every line that you have diagnostic
@@ -67,11 +68,12 @@ let g:diagnostic_auto_popup_while_jump = 0
 ### Enable/Disable insert delay
 - Neovim built in language server will keep sending diagnostic message when you're
 in insert mode, sometimes it could be kind of distraction especially when you have
-virtual text enable. Diagnostic-nvim delay message when you're insert mode for you,
-you can open it up by
+virtual text enable. If you don't want to show diagnostic while insert mode, turn
+on this option by
 ```
-let g:diagnostic_insert_delay = 0
+let g:diagnostic_insert_delay = 1
 ```
+- **NOTE:** this option is not function correctly in the newest branch of neovim.
 
 ## Future Work
 
