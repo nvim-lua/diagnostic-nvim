@@ -49,14 +49,32 @@ is disable by default, you can open enable it by
 ```
 let g:diagnostic_enable_virtual_text = 1
 ```
-- Make sure to use the latest branch of neovim which have sign support.
+
+### Change virtual text prefix
+- Diagnostic-nvim provide an option to change the virtual text prefix, the default
+prefix is '■', but if you have nerd font or other power line font support, you can
+make it a little more fancy by
+```
+let g:diagnostic_virtual_text_prefix = ' '
+```
+
+### Trimming virtual text
+- Sometimes you can be working with language which have long virtual text, Diagnostic-nvim
+provide a an option to trimmed the virtual text to fit your usage by
+```
+let g:diagnostic_trimmed_virtual_text = '20'
+```
+- If virtual text exceed the value that you set, `...` will be displayed in the end.
+- Note that setting this option to `0` means that only shows prefix.
+- By default, this value is set to `v:null`, which means no trimmed at all.
 
 ### Enable/Disable Sign
-- By default, diagnostic-nvim will show sign on every line that you have diagnostic
+- By default, built-in LSP will show sign on every line that you have diagnostic
 message on it. You can turn it off by
 ```
 let g:diagnostic_show_sign = 0
 ```
+- Make sure to use the latest branch of neovim which have sign support.
 
 ### Enable/Disable auto popup window
 - When you jump to next or previous diagnostic, line diagnostic message will popup
@@ -73,13 +91,10 @@ on this option by
 ```
 let g:diagnostic_insert_delay = 1
 ```
-- **NOTE:** this option is not function correctly in the newest branch of neovim.
 
-## Future Work
+<!-- ## Future Work -->
 
-- [ ] Option to change virtual text format.
-- [ ] Option to change sign text.
-- [ ] Support different signs for different diagnosis level.
+<!-- - [ ] Option to change virtual text format. -->
 
 ## WARNING
 This plugin is in early stage, might have unexpected issues.

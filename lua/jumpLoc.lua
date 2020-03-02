@@ -1,6 +1,6 @@
 local vim = vim
 local api = vim.api
-local lsp = vim.lsp
+local util = require'util'
 local M = {}
 
 M.init = false
@@ -20,16 +20,14 @@ function M.initLocation()
   end
   local current_row = api.nvim_call_function('line', {"."})
   local current_col = api.nvim_call_function('col', {"."})
-  local row = api.nvim_call_function('line', {"."})
-  local col = api.nvim_call_function('col', {"."})
 
   if M.currentLocationIndex ~= -1 then
     if M.currentLocationIndex > #M.location then
       M.currentLocationIndex = -1
-    elseif row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
+    elseif current_row == M.location[M.currentLocationIndex]['lnum'] and current_col == M.location[M.currentLocationIndex]['col'] then
       return
     else
-      M.checkCurrentLocation(row, col)
+      M.checkCurrentLocation(current_row, current_col)
     end
   end
   for i, v in ipairs(M.location) do
@@ -103,7 +101,7 @@ function M.openLineDiagnostics()
   if api.nvim_get_var('diagnostic_auto_popup_while_jump') == 1 then
     local timer = vim.loop.new_timer()
     timer:start(100, 0, vim.schedule_wrap(function()
-      lsp.util.show_line_diagnostics()
+      util.show_line_diagnostics()
       timer:stop()
       timer:close()
     end))

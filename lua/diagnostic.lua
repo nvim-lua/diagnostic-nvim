@@ -1,4 +1,5 @@
 local vim = vim
+local util = require 'util'
 local M = {}
 local err, method, result, client_id
 
@@ -21,14 +22,14 @@ function M.modifyCallback()
       vim.lsp.err_message("LSP.publishDiagnostics: Couldn't find buffer for ", uri)
       return
     end
-    vim.lsp.util.buf_clear_diagnostics(bufnr)
-    vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
-    vim.lsp.util.buf_diagnostics_underline(bufnr, result.diagnostics)
+    util.buf_clear_diagnostics(bufnr)
+    util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
+    util.buf_diagnostics_underline(bufnr, result.diagnostics)
     if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
-      vim.lsp.util.buf_diagnostics_signs(bufnr, result.diagnostics)
+      util.buf_diagnostics_signs(bufnr, result.diagnostics)
     end
     if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
-      vim.lsp.util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
+      util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
     end
     vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
     -- util.set_loclist(result.diagnostics)
@@ -64,7 +65,7 @@ M.on_attach = function(_, _)
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
     vim.api.nvim_command [[augroup DiagnosticInsertDelay]]
       vim.api.nvim_command [[autocmd!]]
-      vim.api.nvim_command [[autocmd InsertLeave, CursorHold <buffer> lua require'diagnostic'.publish_diagnostics()]]
+      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.publish_diagnostics()]]
     vim.api.nvim_command [[augroup end]]
   end
 end

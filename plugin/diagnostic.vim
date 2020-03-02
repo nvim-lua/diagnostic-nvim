@@ -13,6 +13,14 @@ if ! exists('g:diagnostic_enable_virtual_text')
     let g:diagnostic_enable_virtual_text = 0
 endif
 
+if ! exists('g:diagnostic_virtual_text_prefix')
+    let g:diagnostic_virtual_text_prefix = '■'
+endif
+
+if ! exists('g:diagnostic_trimmed_virtual_text')
+    let g:diagnostic_trimmed_virtual_text = v:null
+endif
+
 if ! exists('g:diagnostic_show_sign')
     let g:diagnostic_show_sign = 1
 endif
