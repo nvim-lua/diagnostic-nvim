@@ -18,7 +18,7 @@ if ! exists('g:diagnostic_show_sign')
 endif
 
 if ! exists('g:diagnostic_insert_delay')
-    let g:diagnostic_insert_delay = 1
+    let g:diagnostic_insert_delay = 0
 endif
 
 if ! exists('g:diagnostic_auto_popup_while_jump')
