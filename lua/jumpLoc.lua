@@ -20,6 +20,18 @@ function M.initLocation()
   end
   local current_row = api.nvim_call_function('line', {"."})
   local current_col = api.nvim_call_function('col', {"."})
+  local row = api.nvim_call_function('line', {"."})
+  local col = api.nvim_call_function('col', {"."})
+
+  if M.currentLocationIndex ~= -1 then
+    if M.currentLocationIndex > #M.location then
+      M.currentLocationIndex = -1
+    elseif row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
+      return
+    else
+      M.checkCurrentLocation(row, col)
+    end
+  end
   for i, v in ipairs(M.location) do
     if v['lnum'] > current_row or (v['lnum'] == current_row and v['col'] > current_col) then
       M.nextLocationIndex = i
@@ -41,50 +53,9 @@ function M.updateLocation()
     M.prevLocationIndex = -1
     M.nextLocationIndex = -1
   end
-  M.currentLocationIndex = -1
   M.initLocation()
 end
 
--- adjust location
-function M.updatePosition()
-  if M.prevLocationIndex == -1 and M.nextLocationIndex == -1 then
-    M.initLocation()
-    return
-  end
-  -- Solve some unknown issue
-  -- if M.prevLocationIndex > #M.location or M.nextLocationIndex > #M.location then
-    -- M.initLocation()
-    -- return
-  -- end
-  local row = api.nvim_call_function('line', {"."})
-  local col = api.nvim_call_function('col', {"."})
-
-  if M.currentLocationIndex ~= -1 then
-    if row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
-      return
-    end
-    M.checkCurrentLocation(row, col)
-  end
-  if not M.checkNextLocation(row, col) then
-    -- loop till finding a valid index
-    repeat
-      M.nextLocationIndex = M.nextLocationIndex + 1
-      if M.nextLocationIndex > #M.location then
-        break
-      end
-    until M.checkNextLocation(row, col)
-    M.prevLocationIndex = M.nextLocationIndex - 1
-
-  elseif not M.checkPrevLocation(row, col) then
-    repeat
-      M.prevLocationIndex = M.prevLocationIndex - 1
-      if M.prevLocationIndex == 0 then
-        break
-      end
-    until M.checkPrevLocation(row, col)
-    M.nextLocationIndex = M.prevLocationIndex + 1
-  end
-end
 
 function M.refreshBufEnter()
   -- HACK location list will not refresh when BufEnter
@@ -98,7 +69,7 @@ end
 -- Jump to next location
 -- Show warning text when no next location is available
 function M.jumpNextLocation()
-  M.updatePosition()
+  M.initLocation()
   if M.nextLocationIndex > #M.location or M.nextLocationIndex == -1 then
     api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
   else
@@ -113,7 +84,7 @@ end
 -- Jump to previous location
 -- Show warning text when no previous location is available
 function M.jumpPrevLocation()
-  M.updatePosition()
+  M.initLocation()
   if M.prevLocationIndex == 0 or M.prevLocationIndex == -1 then
     api.nvim_command("echohl WarningMsg | echo 'no previous diagnostic' | echohl None")
   else
