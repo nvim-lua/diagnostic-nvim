@@ -17,8 +17,12 @@ if ! exists('g:diagnostic_virtual_text_prefix')
     let g:diagnostic_virtual_text_prefix = '■'
 endif
 
-if ! exists('g:diagnostic_trimmed_virtual_text')
+if ! exists('g:diagnostic_trimmed_virtual_text') || g:diagnostic_trimmed_virtual_text < 0
     let g:diagnostic_trimmed_virtual_text = v:null
+endif
+
+if ! exists('g:space_before_virtual_text') || g:space_before_virtual_text <= 0
+    let g:space_before_virtual_text = 1
 endif
 
 if ! exists('g:diagnostic_show_sign')

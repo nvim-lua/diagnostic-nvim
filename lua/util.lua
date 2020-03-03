@@ -233,6 +233,7 @@ end
 function M.buf_diagnostics_virtual_text(bufnr, diagnostics)
   local buffer_line_diagnostics = all_buffer_diagnostics[bufnr]
   local prefix = api.nvim_get_var('diagnostic_virtual_text_prefix')
+  local spaces = string.rep(" ", api.nvim_get_var('space_before_virtual_text'))
   if not buffer_line_diagnostics then
     M.buf_diagnostics_save_positions(bufnr, diagnostics)
   end
@@ -242,6 +243,7 @@ function M.buf_diagnostics_virtual_text(bufnr, diagnostics)
   end
   for line, line_diags in pairs(buffer_line_diagnostics) do
     local virt_texts = {}
+    table.insert(virt_texts, {spaces})
     for i = 1, #line_diags - 1 do
       table.insert(virt_texts, {prefix, severity_highlights[line_diags[i].severity]})
     end

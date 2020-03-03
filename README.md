@@ -68,6 +68,13 @@ let g:diagnostic_trimmed_virtual_text = '20'
 - Note that setting this option to `0` means that only shows prefix.
 - By default, this value is set to `v:null`, which means no trimmed at all.
 
+### Spaces before virtual text
+- By default, there will be only a space before virtual text. You can add more spaces
+by
+```
+let g:space_before_virtual_text = 5
+```
+
 ### Enable/Disable Sign
 - By default, built-in LSP will show sign on every line that you have diagnostic
 message on it. You can turn it off by
