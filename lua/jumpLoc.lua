@@ -1,6 +1,7 @@
 local vim = vim
 local api = vim.api
 local util = require'util'
+local diagnostic = require'diagnostic'
 local M = {}
 
 M.init = false
@@ -58,9 +59,9 @@ end
 function M.refreshBufEnter()
   -- HACK location list will not refresh when BufEnter
   -- Use :edit to force refresh buffer, not work if the buffer is modified
-  if api.nvim_buf_get_name(0) ~= '' and #vim.inspect(vim.lsp.buf_get_clients()) ~= 0 then
-    api.nvim_command("silent! exec 'edit'")
-    M.init = false
+  local bufnr = api.nvim_win_get_buf(0)
+  if diagnostic.bufferDiagnostic[bufnr] ~= nil then
+    diagnostic.diagnostics_loclist(bufnr)
   end
 end
 

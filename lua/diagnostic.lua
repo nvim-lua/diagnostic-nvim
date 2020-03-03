@@ -3,6 +3,7 @@ local util = require 'util'
 local M = {}
 local err, method, result, client_id
 
+M.bufferDiagnostic = {}
 
 function M.modifyCallback()
   local callback = 'textDocument/publishDiagnostics'
@@ -18,6 +19,7 @@ function M.modifyCallback()
     end
     local uri = result.uri
     local bufnr = vim.uri_to_bufnr(uri)
+    M.bufferDiagnostic[bufnr] = result
     if not bufnr then
       vim.lsp.err_message("LSP.publishDiagnostics: Couldn't find buffer for ", uri)
       return
@@ -33,12 +35,7 @@ function M.modifyCallback()
     end
     vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
     -- util.set_loclist(result.diagnostics)
-    if result and result.diagnostics then
-      for _, v in ipairs(result.diagnostics) do
-        v.uri = v.uri or result.uri
-      end
-    end
-    vim.lsp.util.set_loclist(vim.lsp.util.locations_to_items(result.diagnostics))
+    M.diagnostics_loclist(bufnr)
     local loc = require 'jumpLoc'
     -- loc.init will be set to false when BufEnter
     if loc.init == false then
@@ -47,6 +44,16 @@ function M.modifyCallback()
       loc.updateLocation()
     end
   end
+end
+
+function M.diagnostics_loclist(bufnr)
+  local local_result = M.bufferDiagnostic[bufnr]
+  if local_result and local_result.diagnostics then
+    for _, v in ipairs(local_result.diagnostics) do
+      v.uri = v.uri or local_result.uri
+    end
+  end
+  vim.lsp.util.set_loclist(vim.lsp.util.locations_to_items(local_result.diagnostics))
 end
 
 function M.publish_diagnostics()
