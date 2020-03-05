@@ -25,10 +25,10 @@ function M.initLocation()
   if M.currentLocationIndex ~= -1 then
     if M.currentLocationIndex > #M.location then
       M.currentLocationIndex = -1
-    elseif current_row == M.location[M.currentLocationIndex]['lnum'] and current_col == M.location[M.currentLocationIndex]['col'] then
+    elseif M.checkCurrentLocation(current_row, current_col) then
       return
     else
-      M.checkCurrentLocation(current_row, current_col)
+      M.adjustLocation(current_row, current_col)
     end
   end
   for i, v in ipairs(M.location) do
@@ -140,12 +140,23 @@ function M.checkPrevLocation(row, col)
   end
 end
 
--- currentLocation is an indicator that user has perform a jump
--- need to re-adjust prevLocationIndex and nextLocationIndex to prevent issues
 function M.checkCurrentLocation(row, col)
   if row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
-    return
-  elseif row > M.location[M.currentLocationIndex]['lnum'] or (row == M.location[M.currentLocationIndex]['lnum'] and col > M.location[M.currentLocationIndex]['col']) then
+    return true
+  -- handle C/C++ edge case
+  elseif row == M.location[M.currentLocationIndex]['lnum'] then
+    local line = api.nvim_get_current_line()
+    if M.location[M.currentLocationIndex]['col'] > #line and col == #line then
+      return true
+    end
+  end
+  return false
+end
+
+-- currentLocation is an indicator that user has perform a jump
+-- need to re-adjust prevLocationIndex and nextLocationIndex to prevent issues
+function M.adjustLocation(row, col)
+  if row > M.location[M.currentLocationIndex]['lnum'] or (row == M.location[M.currentLocationIndex]['lnum'] and col > M.location[M.currentLocationIndex]['col']) then
     M.prevLocationIndex = M.currentLocationIndex
   else
     M.nextLocationIndex = M.currentLocationIndex
