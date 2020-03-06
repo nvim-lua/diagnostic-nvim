@@ -4,12 +4,72 @@ local util = require'util'
 local diagnostic = require'diagnostic'
 local M = {}
 
+
+---------------------------------
+--  local function declartion  --
+---------------------------------
+
+-- currentLocation is an indicator that user has perform a jump
+-- need to re-adjust prevLocationIndex and nextLocationIndex to prevent issues
+local adjustLocation = function(row, col)
+  if row > M.location[M.currentLocationIndex]['lnum'] or (row == M.location[M.currentLocationIndex]['lnum'] and col > M.location[M.currentLocationIndex]['col']) then
+    M.prevLocationIndex = M.currentLocationIndex
+  else
+    M.nextLocationIndex = M.currentLocationIndex
+  end
+  M.currentLocationIndex = -1
+end
+
+local checkCurrentLocation = function(row, col)
+  if row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
+    return true
+  -- handle C/C++ edge case
+  elseif row == M.location[M.currentLocationIndex]['lnum'] then
+    local line = api.nvim_get_current_line()
+    if M.location[M.currentLocationIndex]['col'] > #line and col == #line then
+      return true
+    end
+  end
+  return false
+end
+
+-- check if M.prevLocationIndex is a valid next jump index
+-- @Return bool: true if it's valid, false othwise
+local checkPrevLocation = function(row, col)
+  if M.prevLocationIndex == 0 then
+    return true
+  end
+  if (row < M.location[M.prevLocationIndex]['lnum'] or (row == M.location[M.prevLocationIndex]['lnum'] and col < M.location[M.prevLocationIndex]['col'])) then
+    return false
+  else
+    return true
+  end
+end
+
+-- check if M.nextLocationIndex is a valid next jump index
+-- @Return bool: true if it's valid, false othwise
+local checkNextLocation = function(row, col)
+  if M.nextLocationIndex >  #M.location then
+    return true
+  end
+  if row > M.location[M.nextLocationIndex]['lnum'] or (row == M.location[M.nextLocationIndex]['lnum'] and col > M.location[M.nextLocationIndex]['col']) then
+    return false
+  else
+    return true
+  end
+end
+
+----------------------------------
+--  member function declartion  --
+----------------------------------
+
+-- Init variable
 M.init = false
 M.prevLocationIndex = -1
 M.currentLocationIndex = -1
 M.nextLocationIndex = -1
--- Initialize location and set jump index
 
+-- Initialize location and set jump index
 function M.initLocation()
   -- TODO
   M.location = api.nvim_call_function('getloclist', {0})
@@ -25,10 +85,10 @@ function M.initLocation()
   if M.currentLocationIndex ~= -1 then
     if M.currentLocationIndex > #M.location then
       M.currentLocationIndex = -1
-    elseif M.checkCurrentLocation(current_row, current_col) then
+    elseif checkCurrentLocation(current_row, current_col) then
       return
     else
-      M.adjustLocation(current_row, current_col)
+      adjustLocation(current_row, current_col)
     end
   end
   for i, v in ipairs(M.location) do
@@ -72,6 +132,9 @@ function M.jumpNextLocation()
   if M.nextLocationIndex > #M.location or M.nextLocationIndex == -1 then
     api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
   else
+    while true do
+    end
+    checkNextLocation()
     api.nvim_command("ll"..M.nextLocationIndex)
     M.currentLocationIndex = M.nextLocationIndex
     M.nextLocationIndex = M.currentLocationIndex + 1
@@ -87,6 +150,7 @@ function M.jumpPrevLocation()
   if M.prevLocationIndex == 0 or M.prevLocationIndex == -1 then
     api.nvim_command("echohl WarningMsg | echo 'no previous diagnostic' | echohl None")
   else
+    checkPrevLocation()
     api.nvim_command("ll"..M.prevLocationIndex)
     M.currentLocationIndex = M.prevLocationIndex
     M.nextLocationIndex = M.currentLocationIndex + 1
@@ -112,56 +176,6 @@ end
 function M.openDiagnostics()
   api.nvim_command("lopen")
   api.nvim_command("wincmd p")
-end
-
--- check if M.nextLocationIndex is a valid next jump index
--- @Return bool: true if it's valid, false othwise
-function M.checkNextLocation(row, col)
-  if M.nextLocationIndex >  #M.location then
-    return true
-  end
-  if row > M.location[M.nextLocationIndex]['lnum'] or (row == M.location[M.nextLocationIndex]['lnum'] and col > M.location[M.nextLocationIndex]['col']) then
-    return false
-  else
-    return true
-  end
-end
-
--- check if M.prevLocationIndex is a valid next jump index
--- @Return bool: true if it's valid, false othwise
-function M.checkPrevLocation(row, col)
-  if M.prevLocationIndex == 0 then
-    return true
-  end
-  if (row < M.location[M.prevLocationIndex]['lnum'] or (row == M.location[M.prevLocationIndex]['lnum'] and col < M.location[M.prevLocationIndex]['col'])) then
-    return false
-  else
-    return true
-  end
-end
-
-function M.checkCurrentLocation(row, col)
-  if row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
-    return true
-  -- handle C/C++ edge case
-  elseif row == M.location[M.currentLocationIndex]['lnum'] then
-    local line = api.nvim_get_current_line()
-    if M.location[M.currentLocationIndex]['col'] > #line and col == #line then
-      return true
-    end
-  end
-  return false
-end
-
--- currentLocation is an indicator that user has perform a jump
--- need to re-adjust prevLocationIndex and nextLocationIndex to prevent issues
-function M.adjustLocation(row, col)
-  if row > M.location[M.currentLocationIndex]['lnum'] or (row == M.location[M.currentLocationIndex]['lnum'] and col > M.location[M.currentLocationIndex]['col']) then
-    M.prevLocationIndex = M.currentLocationIndex
-  else
-    M.nextLocationIndex = M.currentLocationIndex
-  end
-  M.currentLocationIndex = -1
 end
 
 return M
