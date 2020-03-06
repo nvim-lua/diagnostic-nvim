@@ -33,31 +33,28 @@ local checkCurrentLocation = function(row, col)
   return false
 end
 
--- check if M.prevLocationIndex is a valid next jump index
--- @Return bool: true if it's valid, false othwise
-local checkPrevLocation = function(row, col)
-  if M.prevLocationIndex == 0 then
-    return true
+local checkPrevLocation = function()
+  if M.currentLocationIndex == -1  then
+    return
   end
-  if (row < M.location[M.prevLocationIndex]['lnum'] or (row == M.location[M.prevLocationIndex]['lnum'] and col < M.location[M.prevLocationIndex]['col'])) then
-    return false
-  else
-    return true
+  while M.location[M.currentLocationIndex]['lnum'] == M.location[M.prevLocationIndex]['lnum'] and M.location[M.currentLocationIndex]['col'] == M.location[M.prevLocationIndex]['col'] do
+    M.currentLocationIndex = M.currentLocationIndex - 1
+    M.prevLocationIndex = M.prevLocationIndex - 1
+    M.nextLocationIndex = M.nextLocationIndex - 1
   end
 end
 
--- check if M.nextLocationIndex is a valid next jump index
--- @Return bool: true if it's valid, false othwise
-local checkNextLocation = function(row, col)
-  if M.nextLocationIndex >  #M.location then
-    return true
+local checkNextLocation = function()
+  if M.currentLocationIndex == -1  then
+    return
   end
-  if row > M.location[M.nextLocationIndex]['lnum'] or (row == M.location[M.nextLocationIndex]['lnum'] and col > M.location[M.nextLocationIndex]['col']) then
-    return false
-  else
-    return true
+  while M.location[M.currentLocationIndex]['lnum'] == M.location[M.nextLocationIndex]['lnum'] and M.location[M.currentLocationIndex]['col'] == M.location[M.nextLocationIndex]['col'] do
+    M.currentLocationIndex = M.currentLocationIndex + 1
+    M.prevLocationIndex = M.prevLocationIndex + 1
+    M.nextLocationIndex = M.nextLocationIndex + 1
   end
 end
+
 
 ----------------------------------
 --  member function declartion  --
@@ -132,8 +129,6 @@ function M.jumpNextLocation()
   if M.nextLocationIndex > #M.location or M.nextLocationIndex == -1 then
     api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
   else
-    while true do
-    end
     checkNextLocation()
     api.nvim_command("ll"..M.nextLocationIndex)
     M.currentLocationIndex = M.nextLocationIndex
