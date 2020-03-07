@@ -112,16 +112,6 @@ function M.updateLocation()
   M.initLocation()
 end
 
-
-function M.refreshBufEnter()
-  -- HACK location list will not refresh when BufEnter
-  -- Use :edit to force refresh buffer, not work if the buffer is modified
-  local bufnr = api.nvim_win_get_buf(0)
-  if diagnostic.bufferDiagnostic[bufnr] ~= nil then
-    diagnostic.diagnostics_loclist(bufnr)
-  end
-end
-
 -- Jump to next location
 -- Show warning text when no next location is available
 function M.jumpNextLocation()
