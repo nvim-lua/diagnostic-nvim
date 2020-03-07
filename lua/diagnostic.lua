@@ -39,7 +39,6 @@ end
 
 function M.publish_diagnostics(bufnr)
   local result = M.bufferDiagnostic[bufnr]
-  print("test")
   util.buf_clear_diagnostics(bufnr)
   util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   util.buf_diagnostics_underline(bufnr, result.diagnostics)
