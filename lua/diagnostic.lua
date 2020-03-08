@@ -26,19 +26,18 @@ function M.modifyCallback()
   end
 end
 
-function M.diagnostics_loclist(bufnr)
-  local local_result = M.bufferDiagnostic[bufnr]
+function M.diagnostics_loclist(local_result)
   if local_result and local_result.diagnostics then
     for _, v in ipairs(local_result.diagnostics) do
       v.uri = v.uri or local_result.uri
     end
   end
   vim.lsp.util.set_loclist(vim.lsp.util.locations_to_items(local_result.diagnostics))
-
 end
 
 function M.publish_diagnostics(bufnr)
   local result = M.bufferDiagnostic[bufnr]
+  if result == nil then return end
   util.buf_clear_diagnostics(bufnr)
   util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   util.buf_diagnostics_underline(bufnr, result.diagnostics)
@@ -48,8 +47,8 @@ function M.publish_diagnostics(bufnr)
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
     util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
   end
+  M.diagnostics_loclist(result)
   vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
-  M.diagnostics_loclist(bufnr)
   local loc = require 'jumpLoc'
   -- loc.init will be set to false when BufEnter
   if loc.init == false then
