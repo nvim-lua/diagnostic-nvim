@@ -63,18 +63,20 @@ function M.refresh_diagnostics()
   M.publish_diagnostics(bufnr)
 end
 
+function M.on_InsertLeave()
+  M.refresh_diagnostics()
+end
+
 M.on_attach = function(_, _)
   -- Setup autocmd
   vim.api.nvim_command [[augroup DiagnosticRefresh]]
-    vim.api.nvim_command [[autocmd!]]
     vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'jumpLoc'.initLocation()]]
-    vim.api.nvim_command [[autocmd BufEnter,TabEnter <buffer> lua require'diagnostic'.refresh_diagnostics()]]
+    vim.api.nvim_command [[autocmd BufWinEnter,TabEnter <buffer> lua require'diagnostic'.refresh_diagnostics()]]
   vim.api.nvim_command [[augroup end]]
 
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
     vim.api.nvim_command [[augroup DiagnosticInsertDelay]]
-      vim.api.nvim_command [[autocmd!]]
-      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.refresh_diagnostics()]]
+      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.on_InsertLeave()]]
     vim.api.nvim_command [[augroup end]]
   end
 end
