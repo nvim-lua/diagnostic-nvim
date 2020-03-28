@@ -120,7 +120,7 @@ function M.jumpNextLocation()
     api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
   else
     checkNextLocation()
-    api.nvim_command("ll"..M.nextLocationIndex)
+    api.nvim_command("silent! ll"..M.nextLocationIndex)
     M.currentLocationIndex = M.nextLocationIndex
     M.nextLocationIndex = M.currentLocationIndex + 1
     M.prevLocationIndex = M.currentLocationIndex - 1
@@ -136,7 +136,7 @@ function M.jumpPrevLocation()
     api.nvim_command("echohl WarningMsg | echo 'no previous diagnostic' | echohl None")
   else
     checkPrevLocation()
-    api.nvim_command("ll"..M.prevLocationIndex)
+    api.nvim_command("silent! ll"..M.prevLocationIndex)
     M.currentLocationIndex = M.prevLocationIndex
     M.nextLocationIndex = M.currentLocationIndex + 1
     M.prevLocationIndex = M.currentLocationIndex - 1
