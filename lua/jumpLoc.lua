@@ -1,6 +1,6 @@
 local vim = vim
 local api = vim.api
-local util = require'util'
+local util = require'diagnostic.util'
 local diagnostic = require'diagnostic'
 local M = {}
 

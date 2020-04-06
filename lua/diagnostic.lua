@@ -1,5 +1,5 @@
 local vim = vim
-local util = require 'util'
+local util = require 'diagnostic.util'
 local M = {}
 
 M.bufferDiagnostic = {}
