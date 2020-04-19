@@ -3,9 +3,10 @@ if exists('g:loaded_diagnostic') | finish | endif
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! PrevDiagnostic lua require'jumpLoc'.jumpPrevLocation() 
-command! NextDiagnostic lua require'jumpLoc'.jumpNextLocation() 
-command! OpenDiagnostic lua require'jumpLoc'.openDiagnostics() 
+command! PrevDiagnostic lua require'jumpLoc'.jumpPrevLocation()
+command! NextDiagnostic lua require'jumpLoc'.jumpNextLocation()
+command! NextDiagnosticCycle lua require'jumpLoc'.jumpNextLocationCycle()
+command! OpenDiagnostic lua require'jumpLoc'.openDiagnostics()
 
 " lua require'diagnostic'.modifyCallback()
 

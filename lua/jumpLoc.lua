@@ -128,6 +128,20 @@ function M.jumpNextLocation()
   end
 end
 
+function M.jumpNextLocationCycle()
+  M.initLocation()
+  if #M.location == 0 then
+    return api.nvim_command("echohl WarningMsg | echo 'no diagnostics found' | echohl None")
+  end
+
+  if M.currentLocationIndex < #M.location then
+    M.jumpNextLocation()
+  else
+    api.nvim_command("silent! ll1")
+  end
+end
+
+
 -- Jump to previous location
 -- Show warning text when no previous location is available
 function M.jumpPrevLocation()
