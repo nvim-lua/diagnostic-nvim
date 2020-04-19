@@ -6,16 +6,15 @@ local M = {}
 
 function M.get_next_loc()
   M.location = api.nvim_call_function('getloclist', {0})
-  if #M.location == 0 then
+  if #M.location <= 0 then
     return -1
-  elseif #M.location == 1 then
-    return 1
   end
 
   local cur_row = api.nvim_call_function('line', {"."})
   local cur_col = api.nvim_call_function('col', {"."})
+
   for i, v in ipairs(M.location) do
-    if v['lnum'] > cur_row or (v['lnum'] == cur_row and v['col'] > cur_col) then
+    if v['lnum'] > cur_row or (v['lnum'] == cur_row and v['col'] > cur_col + 1) then
       return i
     end
   end
@@ -26,19 +25,22 @@ function M.get_prev_loc()
   M.location = api.nvim_call_function('getloclist', {0})
   if #M.location == 0 then
     return -1
-  elseif #M.location == 1 then
-    return 1
   end
 
   local cur_row = api.nvim_call_function('line', {"."})
   local cur_col = api.nvim_call_function('col', {"."})
+
   for i, v in ipairs(M.location) do
-    if v['lnum'] > cur_row or (v['lnum'] == cur_row and v['col'] > cur_col) then
-      return i
-    elseif v['lnum'] == cur_row and v['col'] == cur_col then
+    local is_next = v['lnum'] > cur_row or (v['lnum'] == cur_row and v['col'] > cur_col);
+    local is_prev = v['lnum'] == cur_row and cur_col > v['col'];
+    local same_pos = v['lnum'] == cur_row and v['col'] == cur_col;
+    if is_next or same_pos then
       return i - 1
+    elseif is_prev then
+      return i
     end
   end
+
   return -1
 end
 
@@ -53,7 +55,7 @@ end
 -- Show warning text when no next location is available
 function M.jumpNextLocation()
   local i = M.get_next_loc()
-  if i >= 0 then
+  if i >= 1 then
     jumpToLocation(i)
   else
     api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
@@ -62,7 +64,7 @@ end
 
 function M.jumpPrevLocation()
   local i = M.get_prev_loc()
-  if i >= 0 then
+  if i >= 1 then
     jumpToLocation(i)
   else
     api.nvim_command("echohl WarningMsg | echo 'no prev diagnostic' | echohl None")
@@ -71,12 +73,12 @@ end
 
 function M.jumpNextLocationCycle()
   local next_i = M.get_next_loc()
-  if next_i > -1 then
+  if next_i > 0 then
       jumpToLocation(next_i)
   elseif M.get_prev_loc() >= 0 then
     jumpToLocation(1)
   else
-      return api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
+    return api.nvim_command("echohl WarningMsg | echo 'No diagnostics found' | echohl None")
   end
 end
 
