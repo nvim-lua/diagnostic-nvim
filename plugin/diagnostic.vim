@@ -4,6 +4,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 command! PrevDiagnostic lua require'jumpLoc'.jumpPrevLocation()
+command! PrevDiagnosticCycle lua require'jumpLoc'.jumpPrevLocationCycle()
 command! NextDiagnostic lua require'jumpLoc'.jumpNextLocation()
 command! NextDiagnosticCycle lua require'jumpLoc'.jumpNextLocationCycle()
 command! OpenDiagnostic lua require'jumpLoc'.openDiagnostics()

@@ -82,6 +82,17 @@ function M.jumpNextLocationCycle()
   end
 end
 
+function M.jumpPrevLocationCycle()
+  local prev_i = M.get_prev_loc()
+  if prev_i > 0 then
+      jumpToLocation(prev_i)
+  elseif M.get_next_loc() >= 0 then
+    jumpToLocation(#M.location)
+  else
+    return api.nvim_command("echohl WarningMsg | echo 'No diagnostics found' | echohl None")
+  end
+end
+
 -- Open line diagnostics when jump
 -- Don't do anything if diagnostic_auto_popup_while_jump == 0
 -- NOTE need to delay a certain amount of time to show correctly
