@@ -4,143 +4,92 @@ local util = require'diagnostic.util'
 local diagnostic = require'diagnostic'
 local M = {}
 
-
----------------------------------
---  local function declartion  --
----------------------------------
-
--- currentLocation is an indicator that user has perform a jump
--- need to re-adjust prevLocationIndex and nextLocationIndex to prevent issues
-local adjustLocation = function(row, col)
-  if row > M.location[M.currentLocationIndex]['lnum'] or (row == M.location[M.currentLocationIndex]['lnum'] and col > M.location[M.currentLocationIndex]['col']) then
-    M.prevLocationIndex = M.currentLocationIndex
-  else
-    M.nextLocationIndex = M.currentLocationIndex
-  end
-  M.currentLocationIndex = -1
-end
-
-local checkCurrentLocation = function(row, col)
-  if row == M.location[M.currentLocationIndex]['lnum'] and col == M.location[M.currentLocationIndex]['col'] then
-    return true
-  -- handle C/C++ edge case
-  elseif row == M.location[M.currentLocationIndex]['lnum'] then
-    local line = api.nvim_get_current_line()
-    if M.location[M.currentLocationIndex]['col'] > #line and col == #line then
-      return true
-    end
-  end
-  return false
-end
-
-local checkPrevLocation = function()
-  if M.currentLocationIndex == -1  then
-    return
-  end
-  while M.location[M.currentLocationIndex]['lnum'] == M.location[M.prevLocationIndex]['lnum'] and M.location[M.currentLocationIndex]['col'] == M.location[M.prevLocationIndex]['col'] do
-    M.currentLocationIndex = M.currentLocationIndex - 1
-    M.prevLocationIndex = M.prevLocationIndex - 1
-    M.nextLocationIndex = M.nextLocationIndex - 1
-  end
-end
-
-local checkNextLocation = function()
-  if M.currentLocationIndex == -1  then
-    return
-  end
-  while M.location[M.currentLocationIndex]['lnum'] == M.location[M.nextLocationIndex]['lnum'] and M.location[M.currentLocationIndex]['col'] == M.location[M.nextLocationIndex]['col'] do
-    M.currentLocationIndex = M.currentLocationIndex + 1
-    M.prevLocationIndex = M.prevLocationIndex + 1
-    M.nextLocationIndex = M.nextLocationIndex + 1
-  end
-end
-
-
-----------------------------------
---  member function declartion  --
-----------------------------------
-
--- Init variable
-M.init = false
-M.prevLocationIndex = -1
-M.currentLocationIndex = -1
-M.nextLocationIndex = -1
-
--- Initialize location and set jump index
-function M.initLocation()
-  -- TODO
+function M.get_next_loc()
   M.location = api.nvim_call_function('getloclist', {0})
-  if #M.location == 0 then
-    -- let both index be invalid
-    M.prevLocationIndex = -1
-    M.nextLocationIndex = -1
-    return
+  if #M.location <= 0 then
+    return -1
   end
-  local current_row = api.nvim_call_function('line', {"."})
-  local current_col = api.nvim_call_function('col', {"."})
 
-  if M.currentLocationIndex ~= -1 then
-    if M.currentLocationIndex > #M.location then
-      M.currentLocationIndex = -1
-    elseif checkCurrentLocation(current_row, current_col) then
-      return
-    else
-      adjustLocation(current_row, current_col)
-    end
-  end
+  local cur_row = api.nvim_call_function('line', {"."})
+  local cur_col = api.nvim_call_function('col', {"."})
+
   for i, v in ipairs(M.location) do
-    if v['lnum'] > current_row or (v['lnum'] == current_row and v['col'] > current_col) then
-      M.nextLocationIndex = i
-      M.prevLocationIndex = i-1
-      return
+    if v['lnum'] > cur_row or (v['lnum'] == cur_row and v['col'] > cur_col + 1) then
+      return i
+    end
+  end
+  return -1
+end
+
+function M.get_prev_loc()
+  M.location = api.nvim_call_function('getloclist', {0})
+  if #M.location == 0 then
+    return -1
+  end
+
+  local cur_row = api.nvim_call_function('line', {"."})
+  local cur_col = api.nvim_call_function('col', {"."})
+
+  for i, v in ipairs(M.location) do
+    local is_next = v['lnum'] > cur_row or (v['lnum'] == cur_row and v['col'] > cur_col);
+    local is_prev = v['lnum'] == cur_row and cur_col > v['col'];
+    local same_pos = v['lnum'] == cur_row and v['col'] == cur_col;
+    if is_next or same_pos then
+      return i - 1
+    elseif is_prev then
+      return i
     end
   end
 
-  -- TODO Documentation
-  M.nextLocationIndex = #M.location+1
-  M.prevLocationIndex = #M.location
-  M.init = true
+  return -1
 end
 
--- Update location and jump index upon changing location list
-function M.updateLocation()
-  M.location = api.nvim_call_function('getloclist', {0})
-  if #M.location == 0 then
-    M.prevLocationIndex = -1
-    M.nextLocationIndex = -1
+function jumpToLocation(i)
+  if i >= 1 and i <= #M.location then
+    api.nvim_command("silent! ll"..i)
+    M.openLineDiagnostics()
   end
-  M.initLocation()
 end
 
 -- Jump to next location
 -- Show warning text when no next location is available
 function M.jumpNextLocation()
-  M.initLocation()
-  if M.nextLocationIndex > #M.location or M.nextLocationIndex == -1 then
-    api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
+  local i = M.get_next_loc()
+  if i >= 1 then
+    jumpToLocation(i)
   else
-    checkNextLocation()
-    api.nvim_command("silent! ll"..M.nextLocationIndex)
-    M.currentLocationIndex = M.nextLocationIndex
-    M.nextLocationIndex = M.currentLocationIndex + 1
-    M.prevLocationIndex = M.currentLocationIndex - 1
-    M.openLineDiagnostics()
+    api.nvim_command("echohl WarningMsg | echo 'no next diagnostic' | echohl None")
   end
 end
 
--- Jump to previous location
--- Show warning text when no previous location is available
 function M.jumpPrevLocation()
-  M.initLocation()
-  if M.prevLocationIndex == 0 or M.prevLocationIndex == -1 then
-    api.nvim_command("echohl WarningMsg | echo 'no previous diagnostic' | echohl None")
+  local i = M.get_prev_loc()
+  if i >= 1 then
+    jumpToLocation(i)
   else
-    checkPrevLocation()
-    api.nvim_command("silent! ll"..M.prevLocationIndex)
-    M.currentLocationIndex = M.prevLocationIndex
-    M.nextLocationIndex = M.currentLocationIndex + 1
-    M.prevLocationIndex = M.currentLocationIndex - 1
-    M.openLineDiagnostics()
+    api.nvim_command("echohl WarningMsg | echo 'no prev diagnostic' | echohl None")
+  end
+end
+
+function M.jumpNextLocationCycle()
+  local next_i = M.get_next_loc()
+  if next_i > 0 then
+      jumpToLocation(next_i)
+  elseif M.get_prev_loc() >= 0 then
+    jumpToLocation(1)
+  else
+    return api.nvim_command("echohl WarningMsg | echo 'No diagnostics found' | echohl None")
+  end
+end
+
+function M.jumpPrevLocationCycle()
+  local prev_i = M.get_prev_loc()
+  if prev_i > 0 then
+      jumpToLocation(prev_i)
+  elseif M.get_next_loc() >= 0 then
+    jumpToLocation(#M.location)
+  else
+    return api.nvim_command("echohl WarningMsg | echo 'No diagnostics found' | echohl None")
   end
 end
 
@@ -157,6 +106,7 @@ function M.openLineDiagnostics()
     end))
   end
 end
+
 -- Open location window and jump back to current window
 function M.openDiagnostics()
   api.nvim_command("lopen")
