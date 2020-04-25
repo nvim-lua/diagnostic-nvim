@@ -37,7 +37,9 @@ if ! exists('g:diagnostic_auto_popup_while_jump')
     let g:diagnostic_auto_popup_while_jump = 1
 endif
 
-
+if ! exists('g:diagnostic_level')
+    let g:diagnostic_level = 'Warning'
+endif
 
 
 let &cpo = s:save_cpo

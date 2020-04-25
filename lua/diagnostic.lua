@@ -3,6 +3,33 @@ local util = require 'diagnostic.util'
 local M = {}
 
 M.bufferDiagnostic = {}
+local diagnosticTable = {}
+
+local remove_diagnostics = function(diagnostics)
+  -- Remove Index
+  local remove = {}
+  local level = vim.lsp.protocol.DiagnosticSeverity[vim.api.nvim_get_var('diagnostic_level')]
+  for idx, diagnostic in ipairs(diagnostics) do
+    if diagnostic.severity > level then
+      remove[idx] = true
+    else
+      remove[idx] = false
+    end
+  end
+  for i = #diagnostics, 1, -1 do
+    if remove[i] then
+      table.remove(diagnostics, i)
+    end
+  end
+  return diagnostics
+end
+
+local get_diagnostics_count = function(diagnostics, bufnr)
+  diagnosticTable.bufnr = {0, 0, 0, 0}
+  for idx, diagnostic in pairs(diagnostics) do
+    diagnosticTable.bufnr[diagnostic.severity] = diagnosticTable.bufnr[diagnostic.severity] + 1
+  end
+end
 
 function M.modifyCallback()
   local callback = 'textDocument/publishDiagnostics'
@@ -15,6 +42,10 @@ function M.modifyCallback()
     if not bufnr then
       vim.lsp.err_message("LSP.publishDiagnostics: Couldn't find buffer for ", uri)
       return
+    end
+    get_diagnostics_count(result.diagnostics, bufnr)
+    if vim.api.nvim_get_var('diagnostic_level') ~= nil then
+      result.diagnostics = remove_diagnostics(result.diagnostics)
     end
     M.bufferDiagnostic[bufnr] = result
     if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
@@ -67,6 +98,14 @@ end
 function M.on_InsertLeave()
   M.refresh_diagnostics()
 end
+
+function M.getDiagnosticCount(level, bufnr)
+  if diagnosticTable.bufnr == nil then
+    return 0
+  end
+  return diagnosticTable.bufnr[level]
+end
+
 
 M.on_attach = function(_, _)
   -- Setup autocmd
