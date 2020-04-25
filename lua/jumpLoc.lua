@@ -40,8 +40,7 @@ function M.get_prev_loc()
       return i
     end
   end
-
-  return -1
+  return #M.location
 end
 
 function jumpToLocation(i)
