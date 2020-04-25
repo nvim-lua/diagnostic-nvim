@@ -81,13 +81,6 @@ function M.publish_diagnostics(bufnr)
   end
   M.diagnostics_loclist(result)
   vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
-  local loc = require 'jumpLoc'
-  -- loc.init will be set to false when BufEnter
-  if loc.init == false then
-    loc.initLocation()
-  else
-    loc.updateLocation()
-  end
 end
 
 function M.refresh_diagnostics()
@@ -110,7 +103,6 @@ end
 M.on_attach = function(_, _)
   -- Setup autocmd
   vim.api.nvim_command [[augroup DiagnosticRefresh]]
-    vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'jumpLoc'.initLocation()]]
     vim.api.nvim_command [[autocmd BufWinEnter,TabEnter <buffer> lua require'diagnostic'.refresh_diagnostics()]]
   vim.api.nvim_command [[augroup end]]
 
@@ -122,4 +114,3 @@ M.on_attach = function(_, _)
 end
 
 return M
-
