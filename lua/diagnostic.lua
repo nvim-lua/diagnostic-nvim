@@ -102,6 +102,7 @@ end
 
 M.on_attach = function(_, _)
   -- Setup autocmd
+  M.modifyCallback()
   vim.api.nvim_command [[augroup DiagnosticRefresh]]
     vim.api.nvim_command [[autocmd BufWinEnter,TabEnter <buffer> lua require'diagnostic'.refresh_diagnostics()]]
   vim.api.nvim_command [[augroup end]]
