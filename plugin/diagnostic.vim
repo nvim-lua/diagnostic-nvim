@@ -40,7 +40,7 @@ if ! exists('g:diagnostic_auto_popup_while_jump')
 endif
 
 if ! exists('g:diagnostic_level')
-    let g:diagnostic_level = 'Warning'
+    let g:diagnostic_level = 'Hint'
 endif
 
 
