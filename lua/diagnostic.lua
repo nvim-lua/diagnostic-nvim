@@ -70,6 +70,7 @@ function M.publish_diagnostics(bufnr)
   if #vim.lsp.buf_get_clients() == 0 then return end
   local result = M.bufferDiagnostic[bufnr]
   if result == nil then return end
+  vim.api.nvim_command('lexpr []')
   util.buf_clear_diagnostics(bufnr)
   util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   util.buf_diagnostics_underline(bufnr, result.diagnostics)
@@ -104,11 +105,13 @@ M.on_attach = function(_, _)
   -- Setup autocmd
   M.modifyCallback()
   vim.api.nvim_command [[augroup DiagnosticRefresh]]
-    vim.api.nvim_command [[autocmd BufWinEnter,TabEnter <buffer> lua require'diagnostic'.refresh_diagnostics()]]
+    vim.api.nvim_command("autocmd! * <buffer>")
+    vim.api.nvim_command [[autocmd BufEnter,BufWinEnter,TabEnter <buffer> lua require'diagnostic'.refresh_diagnostics()]]
   vim.api.nvim_command [[augroup end]]
 
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
     vim.api.nvim_command [[augroup DiagnosticInsertDelay]]
+      vim.api.nvim_command("autocmd! * <buffer>")
       vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.on_InsertLeave()]]
     vim.api.nvim_command [[augroup end]]
   end
