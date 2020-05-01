@@ -8,6 +8,7 @@ command! PrevDiagnosticCycle lua require'jumpLoc'.jumpPrevLocationCycle()
 command! NextDiagnostic lua require'jumpLoc'.jumpNextLocation()
 command! NextDiagnosticCycle lua require'jumpLoc'.jumpNextLocationCycle()
 command! OpenDiagnostic lua require'jumpLoc'.openDiagnostics()
+command! OpenLineDiagnostic lua require'jumpLoc'.openLineDiagnostics()
 
 " lua require'diagnostic'.modifyCallback()
 
