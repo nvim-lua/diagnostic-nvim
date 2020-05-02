@@ -72,6 +72,7 @@ function M.publish_diagnostics(bufnr)
   if result == nil then return end
   vim.api.nvim_command('lexpr []')
   util.buf_clear_diagnostics(bufnr)
+  vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   util.buf_diagnostics_underline(bufnr, result.diagnostics)
   if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
