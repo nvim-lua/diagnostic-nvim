@@ -252,7 +252,7 @@ function M.buf_diagnostics_virtual_text(bufnr, diagnostics)
     if api.nvim_get_var('diagnostic_trimmed_virtual_text') ~= nil then
       local trimmed_text = last.message:gsub("\r", ""):gsub("\n", "  ")
       trimmed_text = string.sub(trimmed_text, 1, api.nvim_get_var('diagnostic_trimmed_virtual_text'))
-      if #trimmed_text == api.nvim_get_var('diagnostic_trimmed_virtual_text') then
+      if #trimmed_text == api.nvim_get_var('diagnostic_trimmed_virtual_text') and vim.g.diagnostic_trimmed_virtual_text ~= 0 then
         trimmed_text = trimmed_text.."..."
       end
       table.insert(virt_texts, {prefix.." "..trimmed_text, severity_highlights[last.severity]})
