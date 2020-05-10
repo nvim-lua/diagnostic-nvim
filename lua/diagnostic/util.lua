@@ -12,6 +12,7 @@ local function split_lines(value)
 end
 
 local function highlight_range(bufnr, ns, hiname, start, finish)
+  if start[2] < 0 or finish[2] < start[2] then return end
   if start[1] == finish[1] then
     api.nvim_buf_add_highlight(bufnr, ns, hiname, start[1], start[2], finish[2])
   else
