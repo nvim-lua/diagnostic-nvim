@@ -2,6 +2,7 @@ local vim = vim
 local util = require 'diagnostic.util'
 local M = {}
 
+-- TODO change this to use vim.lsp.util.diagnostics_by_buf
 M.bufferDiagnostic = {}
 local diagnosticTable = {}
 
@@ -71,12 +72,12 @@ function M.publish_diagnostics(bufnr)
   local result = M.bufferDiagnostic[bufnr]
   if result == nil then return end
   vim.api.nvim_command('lexpr []')
-  util.buf_clear_diagnostics(bufnr)
+  vim.lsp.util.buf_clear_diagnostics(bufnr)
   vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
-  util.buf_diagnostics_underline(bufnr, result.diagnostics)
+  vim.lsp.util.buf_diagnostics_underline(bufnr, result.diagnostics)
   if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
-    util.buf_diagnostics_signs(bufnr, result.diagnostics)
+    vim.lsp.util.buf_diagnostics_signs(bufnr, result.diagnostics)
   end
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
     util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)

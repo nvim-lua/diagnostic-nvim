@@ -99,7 +99,7 @@ function M.openLineDiagnostics()
   if api.nvim_get_var('diagnostic_auto_popup_while_jump') == 1 then
     local timer = vim.loop.new_timer()
     timer:start(100, 0, vim.schedule_wrap(function()
-      util.show_line_diagnostics()
+      vim.lsp.util.show_line_diagnostics()
       timer:stop()
       timer:close()
     end))
