@@ -46,6 +46,8 @@ lua require'nvim_lsp'.pyls.setup{on_attach=require'diagnostic'.on_attach}
 
 - Use `PrevDiagnostic` and `NextDiagnostic` to jump to the previous and next diagnostic
   under your cursor.
+- `PrevDiagnosticCycle` and `NextDiagnosticCycle` not only jump to the previous and next diagnostic but also
+cycle through the diagnostic if you're at the first or last diagnostic.
 - `OpenDiagnostic` will open a location list and jump back to previous window.
 
 ## Options
@@ -118,10 +120,6 @@ let g:diagnostic_auto_popup_while_jump = 0
 ```vim
 let g:diagnostic_insert_delay = 1
 ```
-
-<!-- ## Future Work -->
-
-<!-- - [ ] Option to change virtual text format. -->
 
 ## WARNING
 
