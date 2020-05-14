@@ -31,6 +31,10 @@ if ! exists('g:diagnostic_show_sign')
     let g:diagnostic_show_sign = 1
 endif
 
+if ! exists('g:diagnostic_sign_priority')
+    let g:diagnostic_sign_priority = 20
+endif
+
 if ! exists('g:diagnostic_insert_delay')
     let g:diagnostic_insert_delay = 0
 endif

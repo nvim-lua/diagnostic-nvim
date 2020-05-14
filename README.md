@@ -100,6 +100,12 @@ let g:space_before_virtual_text = 5
 let g:diagnostic_show_sign = 0
 ```
 
+- The default priority of the diagnostic sign is 20. You can customize it by
+
+```vim
+let g:diagnostic_sign_priority = 20
+```
+
 - Make sure to use the latest branch of Neovim which has sign support.
 
 - If you want to change the symbols of sign, use `sign_define` to change it

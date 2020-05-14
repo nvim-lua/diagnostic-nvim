@@ -77,7 +77,7 @@ function M.publish_diagnostics(bufnr)
   util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   vim.lsp.util.buf_diagnostics_underline(bufnr, result.diagnostics)
   if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
-    vim.lsp.util.buf_diagnostics_signs(bufnr, result.diagnostics)
+    util.buf_diagnostics_signs(bufnr, result.diagnostics)
   end
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
     util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
