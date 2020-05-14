@@ -99,7 +99,17 @@ let g:space_before_virtual_text = 5
 ```vim
 let g:diagnostic_show_sign = 0
 ```
+
 - Make sure to use the latest branch of Neovim which has sign support.
+
+- If you want to change the symbols of sign, use `sign_define` to change it
+
+```vim
+call sign_define("LspDiagnosticsErrorSign", {"text" : "E", "texthl" : "LspDiagnosticsError"})
+call sign_define("LspDiagnosticsWarningSign", {"text" : "W", "texthl" : "LspDiagnosticsWarning"})
+call sign_define("LspDiagnosticInformationSign", {"text" : "I", "texthl" : "LspDiagnosticsInformation"})
+call sign_define("LspDiagnosticHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
+```
 
 ### Enable/Disable auto popup window
 
