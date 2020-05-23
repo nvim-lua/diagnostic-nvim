@@ -54,6 +54,7 @@ function M.modifyCallback()
         return
       end
     end
+
     M.publish_diagnostics(bufnr)
   end
 end
@@ -71,7 +72,7 @@ function M.publish_diagnostics(bufnr)
   if #vim.lsp.buf_get_clients() == 0 then return end
   local result = M.bufferDiagnostic[bufnr]
   if result == nil then return end
-  vim.api.nvim_command('lexpr []')
+  vim.fn.setloclist(0, {}, 'r')
   vim.lsp.util.buf_clear_diagnostics(bufnr)
   vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
   util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
@@ -83,7 +84,10 @@ function M.publish_diagnostics(bufnr)
     util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
   end
   M.diagnostics_loclist(result)
-  vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
+
+  vim.schedule_wrap(function()
+    vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
+  end)
 end
 
 function M.refresh_diagnostics()
