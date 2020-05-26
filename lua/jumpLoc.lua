@@ -43,7 +43,7 @@ function M.get_prev_loc()
   return #M.location
 end
 
-function jumpToLocation(i)
+local function jumpToLocation(i)
   if i >= 1 and i <= #M.location then
     api.nvim_command("silent! ll"..i)
     M.openLineDiagnostics()
@@ -88,6 +88,22 @@ function M.jumpPrevLocationCycle()
   elseif M.get_next_loc() >= 0 then
     jumpToLocation(#M.location)
   else
+    return api.nvim_command("echohl WarningMsg | echo 'No diagnostics found' | echohl None")
+  end
+end
+
+function M.jumpFirstLocation()
+  M.location = api.nvim_call_function('getloclist', {0})
+  jumpToLocation(1)
+  if #M.location == 0 then
+    return api.nvim_command("echohl WarningMsg | echo 'No diagnostics found' | echohl None")
+  end
+end
+
+function M.jumpLastLocation()
+  M.location = api.nvim_call_function('getloclist', {0})
+  jumpToLocation(#M.location)
+  if #M.location == 0 then
     return api.nvim_command("echohl WarningMsg | echo 'No diagnostics found' | echohl None")
   end
 end
