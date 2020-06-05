@@ -69,6 +69,9 @@ function M.diagnostics_loclist(local_result)
 end
 
 function M.publish_diagnostics(bufnr)
+  if vim.fn.filereadable(vim.fn.expand("%")) == 0 then
+    return
+  end
   if vim.fn.getcmdwintype() == ':' then return end
   if #vim.lsp.buf_get_clients() == 0 then return end
   local result = M.bufferDiagnostic[bufnr]
