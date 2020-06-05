@@ -69,9 +69,6 @@ function M.diagnostics_loclist(local_result)
 end
 
 function M.publish_diagnostics(bufnr)
-  if vim.fn.filereadable(vim.fn.expand("%")) == 0 then
-    return
-  end
   if vim.fn.getcmdwintype() == ':' then return end
   if #vim.lsp.buf_get_clients() == 0 then return end
   local result = M.bufferDiagnostic[bufnr]
@@ -87,7 +84,9 @@ function M.publish_diagnostics(bufnr)
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
     util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
   end
-  M.diagnostics_loclist(result)
+  if vim.fn.filereadable(vim.fn.expand("%")) == 0 then
+    M.diagnostics_loclist(result)
+  end
 
   vim.schedule_wrap(function()
     vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
