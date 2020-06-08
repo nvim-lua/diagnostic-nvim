@@ -84,9 +84,7 @@ function M.publish_diagnostics(bufnr)
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
     util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
   end
-  if vim.fn.filereadable(vim.fn.expand("%")) == 0 then
-    M.diagnostics_loclist(result)
-  end
+  M.diagnostics_loclist(result)
 
   vim.schedule_wrap(function()
     vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
