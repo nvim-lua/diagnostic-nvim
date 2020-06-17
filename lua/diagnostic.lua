@@ -90,7 +90,7 @@ function M.publish_diagnostics(bufnr)
 
   vim.schedule_wrap(function()
     vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
-  end)
+  end)()
 end
 
 function M.refresh_diagnostics()
