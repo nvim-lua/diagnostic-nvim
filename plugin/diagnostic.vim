@@ -53,6 +53,10 @@ if ! exists('g:diagnostic_level')
     let g:diagnostic_level = 'Hint'
 endif
 
+if ! exists('g:diagnostic_enable_location_list')
+    let g:diagnostic_enable_location_list = 1
+endif
+
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

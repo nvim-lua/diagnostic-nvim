@@ -65,7 +65,10 @@ function M.diagnostics_loclist(local_result)
       v.uri = v.uri or local_result.uri
     end
   end
-  vim.lsp.util.set_loclist(vim.lsp.util.locations_to_items(local_result.diagnostics))
+
+  if vim.api.nvim_get_var('diagnostic_enable_location_list') == 1 then
+      vim.lsp.util.set_loclist(vim.lsp.util.locations_to_items(local_result.diagnostics))
+  end
 end
 
 function M.publish_diagnostics(bufnr)
