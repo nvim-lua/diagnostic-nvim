@@ -28,7 +28,7 @@ make it a more user friendly without adding too much to it.
 - Install with any plugin manager by using the path on GitHub.
 
 ```vim
-Plug 'haorenW1025/diagnostic-nvim'
+Plug 'nvim-lua/diagnostic-nvim'
 ```
 
 ## Setup
