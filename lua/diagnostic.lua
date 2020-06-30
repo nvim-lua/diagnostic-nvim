@@ -87,11 +87,12 @@ function M.publish_diagnostics(bufnr)
     util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
   end
   M.diagnostics_loclist(result)
-
-  vim.schedule_wrap(function()
-    vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
-  end)
+  M.trigger_diagnostics_changed()
 end
+
+M.trigger_diagnostics_changed = vim.schedule_wrap(function()
+    vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
+end)
 
 function M.refresh_diagnostics()
   local bufnr = vim.api.nvim_win_get_buf(0)
