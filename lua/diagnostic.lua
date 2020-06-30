@@ -3,8 +3,8 @@ local util = require 'diagnostic.util'
 local M = {}
 
 -- TODO change this to use vim.lsp.util.diagnostics_by_buf
-M.bufferDiagnostic = {}
 local diagnosticTable = {}
+
 
 local remove_diagnostics = function(diagnostics)
   -- Remove Index
@@ -38,7 +38,7 @@ function M.modifyCallback()
     if not result then
       return
     end
-    local uri = result.uri
+    uri = result.uri
     local bufnr = vim.uri_to_bufnr(uri)
     if not bufnr then
       vim.lsp.err_message("LSP.publishDiagnostics: Couldn't find buffer for ", uri)
@@ -48,7 +48,7 @@ function M.modifyCallback()
     if vim.api.nvim_get_var('diagnostic_level') ~= nil then
       result.diagnostics = remove_diagnostics(result.diagnostics)
     end
-    M.bufferDiagnostic[bufnr] = result
+    vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
     if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
       if vim.api.nvim_get_mode()['mode'] == "i" or vim.api.nvim_get_mode()['mode'] == "ic" then
         return
@@ -60,33 +60,31 @@ function M.modifyCallback()
 end
 
 function M.diagnostics_loclist(local_result)
-  if local_result and local_result.diagnostics then
-    for _, v in ipairs(local_result.diagnostics) do
-      v.uri = v.uri or local_result.uri
+  if local_result then
+    for _, v in ipairs(local_result) do
+      v.uri = v.uri or uri
     end
   end
-  vim.lsp.util.set_loclist(vim.lsp.util.locations_to_items(local_result.diagnostics))
+  vim.lsp.util.set_loclist(util.locations_to_items(local_result))
 end
 
 function M.publish_diagnostics(bufnr)
   if vim.fn.getcmdwintype() == ':' then return end
-  if #vim.lsp.buf_get_clients() == 0 then return end
-  local result = M.bufferDiagnostic[bufnr]
-  if result == nil then return end
-  vim.fn.setloclist(0, {}, 'r')
   vim.lsp.util.buf_clear_diagnostics(bufnr)
-  vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
-  util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
+  if #vim.lsp.buf_get_clients() == 0 then return end
+  local diagnostics = vim.lsp.util.diagnostics_by_buf[bufnr]
+  if diagnostics == nil then return end
+  vim.fn.setloclist(0, {}, 'r')
   if vim.api.nvim_get_var('diagnostic_enable_underline') == 1 then
-    vim.lsp.util.buf_diagnostics_underline(bufnr, result.diagnostics)
+    vim.lsp.util.buf_diagnostics_underline(bufnr, diagnostics)
   end
   if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
-    util.buf_diagnostics_signs(bufnr, result.diagnostics)
+    util.buf_diagnostics_signs(bufnr, diagnostics)
   end
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
-    util.buf_diagnostics_virtual_text(bufnr, result.diagnostics)
+    util.buf_diagnostics_virtual_text(bufnr, diagnostics)
   end
-  M.diagnostics_loclist(result)
+  M.diagnostics_loclist(diagnostics)
   M.trigger_diagnostics_changed()
 end
 

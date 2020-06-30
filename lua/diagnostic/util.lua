@@ -102,6 +102,67 @@ function M.buf_diagnostics_virtual_text(bufnr, diagnostics)
   end
 end
 
+local function sort_by_key(fn)
+  return function(a,b)
+    local ka, kb = fn(a), fn(b)
+    assert(#ka == #kb)
+    for i = 1, #ka do
+      if ka[i] ~= kb[i] then
+        return ka[i] < kb[i]
+      end
+    end
+    -- every value must have been equal here, which means it's not less than.
+    return false
+  end
+end
+
+local position_sort = sort_by_key(function(v)
+  return {v.start.line, v.start.character}
+end)
+
+
+function M.locations_to_items(locations)
+  local items = {}
+  local grouped = setmetatable({}, {
+    __index = function(t, k)
+      local v = {}
+      rawset(t, k, v)
+      return v
+    end;
+  })
+  local fname = api.nvim_buf_get_name(0)
+  for _, d in ipairs(locations) do
+    local range = d.range or d.targetSelectionRange
+    table.insert(grouped[fname], {start = range.start})
+  end
+
+
+  local keys = vim.tbl_keys(grouped)
+  table.sort(keys)
+  local rows = grouped[fname]
+
+  table.sort(rows, position_sort)
+  local bufnr = vim.fn.bufnr()
+  for _, temp in ipairs(rows) do
+    local pos = temp.start
+    local row = pos.line
+    local line = api.nvim_buf_get_lines(0, row, row+1, true)[1]
+    local col
+    if pos.character > #line then
+      col = #line
+    else
+      col = vim.str_byteindex(line, pos.character)
+    end
+    table.insert(items, {
+      bufnr = bufnr,
+      lnum = row + 1,
+      col = col + 1;
+      text = line
+    })
+  end
+  return items
+end
+
 function M.buf_diagnostics_signs(bufnr, diagnostics)
   for _, diagnostic in ipairs(diagnostics) do
     local diagnostic_severity_map = {
