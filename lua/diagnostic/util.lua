@@ -146,19 +146,22 @@ function M.locations_to_items(locations)
   for _, temp in ipairs(rows) do
     local pos = temp.start
     local row = pos.line
-    local line = api.nvim_buf_get_lines(0, row, row+1, true)[1]
-    local col
-    if pos.character > #line then
-      col = #line
-    else
-      col = vim.str_byteindex(line, pos.character)
+    local line = api.nvim_buf_get_lines(0, row, row+1, false)[1]
+    if line then
+      local col
+      if pos.character > #line then
+        col = #line
+      else
+        col = vim.str_byteindex(line, pos.character)
+      end
+
+      table.insert(items, {
+        bufnr = bufnr,
+        lnum = row + 1,
+        col = col + 1;
+        text = line
+      })
     end
-    table.insert(items, {
-      bufnr = bufnr,
-      lnum = row + 1,
-      col = col + 1;
-      text = line
-    })
   end
   return items
 end
