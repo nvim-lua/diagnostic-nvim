@@ -13,6 +13,7 @@ make it a more user friendly without adding too much to it.
 - Jump to next/previous diagnostic under your cursor.
 - Automatically open pop up window that shows line diagnostic while jumping.
 - Show error sign in columns.
+- Show error underline in symbols.
 - Delay diagnostic when you're in insert mode.
 
 ## Demo
@@ -115,6 +116,15 @@ call sign_define("LspDiagnosticsErrorSign", {"text" : "E", "texthl" : "LspDiagno
 call sign_define("LspDiagnosticsWarningSign", {"text" : "W", "texthl" : "LspDiagnosticsWarning"})
 call sign_define("LspDiagnosticsInformationSign", {"text" : "I", "texthl" : "LspDiagnosticsInformation"})
 call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
+```
+
+### Enable/Disable Underline
+
+- By default, the build-in Nvim LSP will show a underline on every symbol that
+  you have a diagnostic message on. You can turn this off by
+
+```vim
+let g:diagnostic_enable_underline = 0
 ```
 
 ### Enable/Disable auto popup window
