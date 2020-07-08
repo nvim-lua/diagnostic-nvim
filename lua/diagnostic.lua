@@ -48,6 +48,7 @@ function M.modifyCallback()
     if vim.api.nvim_get_var('diagnostic_level') ~= nil then
       result.diagnostics = remove_diagnostics(result.diagnostics)
     end
+    vim.lsp.util.buf_clear_diagnostics(bufnr)
     vim.lsp.util.buf_diagnostics_save_positions(bufnr, result.diagnostics)
     if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
       if vim.api.nvim_get_mode()['mode'] == "i" or vim.api.nvim_get_mode()['mode'] == "ic" then
@@ -70,7 +71,6 @@ end
 
 function M.publish_diagnostics(bufnr)
   if vim.fn.getcmdwintype() == ':' then return end
-  vim.lsp.util.buf_clear_diagnostics(bufnr)
   if #vim.lsp.buf_get_clients() == 0 then return end
   local diagnostics = vim.lsp.util.diagnostics_by_buf[bufnr]
   if diagnostics == nil then return end
