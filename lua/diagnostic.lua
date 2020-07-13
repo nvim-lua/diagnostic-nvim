@@ -44,6 +44,9 @@ function M.modifyCallback()
       vim.lsp.err_message("LSP.publishDiagnostics: Couldn't find buffer for ", uri)
       return
     end
+    if vim.api.nvim_win_get_buf(vim.api.nvim_get_current_win()) ~= bufnr then
+      return
+    end
     get_diagnostics_count(result.diagnostics, bufnr)
     if vim.api.nvim_get_var('diagnostic_level') ~= nil then
       result.diagnostics = remove_diagnostics(result.diagnostics)
