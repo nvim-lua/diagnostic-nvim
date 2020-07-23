@@ -70,28 +70,29 @@ function M.buf_diagnostics_save_positions(bufnr, diagnostics)
 end
 
 function M.buf_diagnostics_virtual_text(bufnr, diagnostics)
-  local buffer_line_diagnostics = all_buffer_diagnostics[bufnr]
   local prefix = api.nvim_get_var('diagnostic_virtual_text_prefix')
   local spaces = string.rep(" ", api.nvim_get_var('space_before_virtual_text'))
-  if not buffer_line_diagnostics then
-    M.buf_diagnostics_save_positions(bufnr, diagnostics)
-  end
-  buffer_line_diagnostics = all_buffer_diagnostics[bufnr]
+  M.buf_diagnostics_save_positions(bufnr, diagnostics)
+  local buffer_line_diagnostics = all_buffer_diagnostics[bufnr]
   if not buffer_line_diagnostics then
     return
   end
-  for line, line_diags in pairs(buffer_line_diagnostics) do
+  for line, line_diagnostics in pairs(buffer_line_diagnostics) do
     local virt_texts = {}
     table.insert(virt_texts, {spaces})
-    for i = 1, #line_diags - 1 do
-      table.insert(virt_texts, {prefix, severity_highlights[line_diags[i].severity]})
+    local last = line_diagnostics[#line_diagnostics]
+    for i = 1, #line_diagnostics - 1 do
+      table.insert(virt_texts, {prefix, severity_highlights[line_diagnostics[i].severity]})
     end
-    local last = line_diags[#line_diags]
+
     -- TODO(ashkan) use first line instead of subbing 2 spaces?
     if api.nvim_get_var('diagnostic_trimmed_virtual_text') ~= nil then
       local trimmed_text = last.message:gsub("\r", ""):gsub("\n", "  ")
       trimmed_text = string.sub(trimmed_text, 1, api.nvim_get_var('diagnostic_trimmed_virtual_text'))
-      if #trimmed_text == api.nvim_get_var('diagnostic_trimmed_virtual_text') and vim.g.diagnostic_trimmed_virtual_text ~= 0 then
+      if (
+        #trimmed_text == api.nvim_get_var('diagnostic_trimmed_virtual_text')
+        and vim.g.diagnostic_trimmed_virtual_text ~= 0
+        ) then
         trimmed_text = trimmed_text.."..."
       end
       table.insert(virt_texts, {prefix.." "..trimmed_text, severity_highlights[last.severity]})
