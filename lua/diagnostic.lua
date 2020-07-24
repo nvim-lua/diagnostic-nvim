@@ -74,6 +74,7 @@ function M.publish_diagnostics(bufnr)
   if #vim.lsp.buf_get_clients() == 0 then return end
   local diagnostics = vim.lsp.util.diagnostics_by_buf[bufnr]
   if diagnostics == nil then return end
+  util.align_diagnostic_indices(diagnostics)
   vim.fn.setloclist(0, {}, 'r')
   if vim.api.nvim_get_var('diagnostic_enable_underline') == 1 then
     vim.lsp.util.buf_diagnostics_underline(bufnr, diagnostics)

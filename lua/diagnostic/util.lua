@@ -179,4 +179,11 @@ function M.buf_diagnostics_signs(bufnr, diagnostics)
   end
 end
 
+function M.align_diagnostic_indices(diagnostics)
+  for idx, diagnostic in ipairs(diagnostics) do
+    if diagnostic.range.start.character < 0 then diagnostic.range.start.character = 0 end
+    if diagnostic.range['end'].character < 0 then diagnostic.range['end'].character = 0 end
+  end
+end
+
 return M
