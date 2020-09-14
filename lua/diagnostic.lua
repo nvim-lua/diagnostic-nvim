@@ -98,6 +98,10 @@ function M.refresh_diagnostics()
   M.publish_diagnostics(bufnr)
 end
 
+M.on_BufEnter = vim.schedule_wrap(function()
+  M.refresh_diagnostics()
+end)
+
 function M.on_InsertLeave()
   M.refresh_diagnostics()
 end
@@ -115,7 +119,7 @@ M.on_attach = function(_, _)
   M.modifyCallback()
   vim.api.nvim_command [[augroup DiagnosticRefresh]]
     vim.api.nvim_command("autocmd! * <buffer>")
-    vim.api.nvim_command [[autocmd BufEnter,BufWinEnter,TabEnter <buffer> lua require'diagnostic'.refresh_diagnostics()]]
+    vim.api.nvim_command [[autocmd BufEnter,BufWinEnter,TabEnter <buffer> lua require'diagnostic'.on_BufEnter()]]
   vim.api.nvim_command [[augroup end]]
 
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
