@@ -66,7 +66,9 @@ function M.diagnostics_loclist(local_result)
       v.uri = v.uri or uri
     end
   end
-  vim.lsp.util.set_loclist(util.locations_to_items(local_result))
+  if #vim.fn.getloclist(vim.fn.winnr()) == 0 then
+    vim.lsp.util.set_loclist(util.locations_to_items(local_result))
+  end
 end
 
 function M.publish_diagnostics(bufnr)
