@@ -86,8 +86,12 @@ function M.publish_diagnostics(bufnr)
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
     util.buf_diagnostics_virtual_text(bufnr, diagnostics)
   end
-  vim.fn.setloclist(0, {}, 'r')
-  M.diagnostics_loclist(diagnostics)
+  local title = vim.fn.getloclist(vim.fn.winnr(), {title= 1})['title']
+  if title == "Language Server" or string.len(title) == 0 then
+    vim.fn.setloclist(0, {}, 'r')
+    M.diagnostics_loclist(diagnostics)
+  end
+  M.trigger_diagnostics_changed()
 end
 
 M.trigger_diagnostics_changed = vim.schedule_wrap(function()
