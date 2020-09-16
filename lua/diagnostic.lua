@@ -86,11 +86,8 @@ function M.publish_diagnostics(bufnr)
   if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
     util.buf_diagnostics_virtual_text(bufnr, diagnostics)
   end
-  if #vim.fn.getloclist(vim.fn.winnr()) == 0 then
-    vim.fn.setloclist(0, {}, 'r')
-    M.diagnostics_loclist(diagnostics)
-  end
-  M.trigger_diagnostics_changed()
+  vim.fn.setloclist(0, {}, 'r')
+  M.diagnostics_loclist(diagnostics)
 end
 
 M.trigger_diagnostics_changed = vim.schedule_wrap(function()
