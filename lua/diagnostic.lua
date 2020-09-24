@@ -66,7 +66,9 @@ function M.diagnostics_loclist(local_result)
       v.uri = v.uri or uri
     end
   end
-  vim.lsp.util.set_loclist(util.locations_to_items(local_result))
+  if #vim.fn.getloclist(vim.fn.winnr()) == 0 then
+    vim.lsp.util.set_loclist(util.locations_to_items(local_result))
+  end
 end
 
 function M.publish_diagnostics(bufnr)
@@ -75,7 +77,6 @@ function M.publish_diagnostics(bufnr)
   local diagnostics = vim.lsp.util.diagnostics_by_buf[bufnr]
   if diagnostics == nil then return end
   util.align_diagnostic_indices(diagnostics)
-  vim.fn.setloclist(0, {}, 'r')
   if vim.api.nvim_get_var('diagnostic_enable_underline') == 1 then
     vim.lsp.util.buf_diagnostics_underline(bufnr, diagnostics)
   end
@@ -103,8 +104,11 @@ function M.publish_diagnostics(bufnr)
   if virtual_text == 1 then
     util.buf_diagnostics_virtual_text(bufnr, diagnostics)
   end
-
-  M.diagnostics_loclist(diagnostics)
+  local title = vim.fn.getloclist(vim.fn.winnr(), {title= 1})['title']
+  if title == "Language Server" or string.len(title) == 0 then
+    vim.fn.setloclist(0, {}, 'r')
+    M.diagnostics_loclist(diagnostics)
+  end
   M.trigger_diagnostics_changed()
 end
 
