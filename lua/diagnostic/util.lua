@@ -175,7 +175,10 @@ function M.buf_diagnostics_signs(bufnr, diagnostics)
       [protocol.DiagnosticSeverity.Information] = "LspDiagnosticsInformationSign";
       [protocol.DiagnosticSeverity.Hint] = "LspDiagnosticsHintSign";
     }
-    vim.fn.sign_place(0, sign_ns, diagnostic_severity_map[diagnostic.severity], bufnr, {lnum=(diagnostic.range.start.line+1), priority=vim.g.diagnostic_sign_priority})
+    pcall(
+      vim.fn.sign_place,
+      0, sign_ns, diagnostic_severity_map[diagnostic.severity], bufnr, {lnum=(diagnostic.range.start.line+1), priority=vim.g.diagnostic_sign_priority}
+    )
   end
 end
 
