@@ -121,7 +121,18 @@ function M.getDiagnosticCount(level, bufnr)
 end
 
 
+local warned = false
 M.on_attach = function(_, _)
+  if not warned and vim.lsp.diagnostic then
+    warned = true
+    vim.api.nvim_err_write([['vim.lsp.diagnostic' is now builtin. 'nvim-lua/diagnostic-nvim' is now deprecated.
+To migrate from 'nvim-lua/diagnostic-nvim' to builtin,
+  See: https://github.com/nvim-lua/diagnostic-nvim/issues/73
+For more information about new features,
+  See: https://github.com/neovim/neovim/pull/12655
+]])
+  end
+
   -- Setup autocmd
   M.modifyCallback()
   vim.api.nvim_command [[augroup DiagnosticRefresh]]
