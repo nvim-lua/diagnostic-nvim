@@ -80,10 +80,28 @@ function M.publish_diagnostics(bufnr)
   if vim.api.nvim_get_var('diagnostic_enable_underline') == 1 then
     vim.lsp.util.buf_diagnostics_underline(bufnr, diagnostics)
   end
-  if vim.api.nvim_get_var('diagnostic_show_sign') == 1 then
+
+  local show_sign
+
+  if vim.b.diagnostic_show_sign ~= nil then
+    show_sign = vim.b.diagnostic_show_sign
+  else
+    show_sign = vim.api.nvim_get_var('diagnostic_show_sign')
+  end
+
+  if show_sign == 1 then
     util.buf_diagnostics_signs(bufnr, diagnostics)
   end
-  if vim.api.nvim_get_var('diagnostic_enable_virtual_text') == 1 then
+
+  local virtual_text
+
+  if vim.b.diagnostic_enable_virtual_text ~= nil then
+    virtual_text = vim.b.diagnostic_enable_virtual_text
+  else
+    virtual_text = vim.api.nvim_get_var('diagnostic_enable_virtual_text')
+  end
+
+  if virtual_text == 1 then
     util.buf_diagnostics_virtual_text(bufnr, diagnostics)
   end
   local title = vim.fn.getloclist(vim.fn.winnr(), {title= 1})['title']
@@ -95,7 +113,7 @@ function M.publish_diagnostics(bufnr)
 end
 
 M.trigger_diagnostics_changed = vim.schedule_wrap(function()
-    vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
+  vim.api.nvim_command("doautocmd User LspDiagnosticsChanged")
 end)
 
 function M.refresh_diagnostics()
@@ -142,8 +160,8 @@ For more information about new features,
 
   if vim.api.nvim_get_var('diagnostic_insert_delay') == 1 then
     vim.api.nvim_command [[augroup DiagnosticInsertDelay]]
-      vim.api.nvim_command("autocmd! * <buffer>")
-      vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.on_InsertLeave()]]
+    vim.api.nvim_command("autocmd! * <buffer>")
+    vim.api.nvim_command [[autocmd InsertLeave <buffer> lua require'diagnostic'.on_InsertLeave()]]
     vim.api.nvim_command [[augroup end]]
   end
 end
