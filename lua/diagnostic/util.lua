@@ -153,7 +153,7 @@ function M.locations_to_items(locations)
       if pos.character > #line then
         col = #line
       else
-        col = vim.str_byteindex(line, pos.character)
+        col = pos.character
       end
 
       table.insert(items, {
